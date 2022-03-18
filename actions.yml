@@ -1,0 +1,35 @@
+name: 'WIPAC Dev Mypy'
+description: 'GitHub Action Package for Running Mypy'
+
+# inputs:
+#   who-to-greet:  # id of input
+#     description: 'Who to greet'
+#     required: true
+#     default: 'World'
+
+# outputs:
+#   random-number:
+#     description: "Random number"
+#     value: ${{ steps.random-number-generator.outputs.random-id }}
+
+runs:
+  using: "composite"
+  steps:
+    - run: pip install --upgrade pip
+      shell: bash
+    - run: pip install mypy
+      shell: bash
+    - name: Install Dev Requirements
+      run: |
+        ([ -e "requirements-dev.txt" ] && pip install -r requirements-dev.txt) || echo "no dev reqs"
+      shell: bash
+    - name: Pip Install Local Package (or All Requirements)
+      run: |
+        ([ -e "setup.py" ] && pip install .) || pip install `find . -name 'requirements.txt' | rev | sed -z 's/\n/ r- /g' | rev`
+      shell: bash
+    - name: Run Mypy (and Try to Install Type-Packages)
+      run: |
+        flags="--namespace-packages --exclude build/"
+        it_flags="--install-types --non-interactive"
+        (mypy $it_flags $flags . 2>/dev/null) || (echo "no type-packages to install" && mypy $flags .)
+      shell: bash

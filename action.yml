@@ -22,7 +22,8 @@ runs:
     - name: Pip Install Local Package and All 'requirements*.txt' Files We Find
       run: |
         ([ -e "setup.py" ] && pip install .) || (echo "no setup.py")
-        pip install `find . -name 'requirements*.txt' | rev | sed -z 's/\n/ r- /g' | rev`
+        # ex: pip install -r requirements.txt requirements-dev.txt foo/requirements.txt
+        (pip install `find . -name 'requirements*.txt' | rev | sed -z 's/\n/ r- /g' | rev`) || (echo "no requirements*.txt files")
       shell: bash
     - name: Run Mypy (and Try to Install Type-Packages)
       run: |

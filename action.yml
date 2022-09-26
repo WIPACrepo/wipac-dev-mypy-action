@@ -19,13 +19,11 @@ runs:
       shell: bash
     - run: pip install mypy
       shell: bash
-    - name: Install Dev Requirements
+    - name: Pip Install Local Package and All 'requirements*.txt' Files We Find
       run: |
-        ([ -e "requirements-dev.txt" ] && pip install -r requirements-dev.txt) || echo "no dev reqs"
-      shell: bash
-    - name: Pip Install Local Package (or All Requirements)
-      run: |
-        ([ -e "setup.py" ] && pip install .) || pip install `find . -name 'requirements.txt' | rev | sed -z 's/\n/ r- /g' | rev`
+        ([ -e "setup.py" ] && pip install .) || (echo "no setup.py")
+        # ex: pip install -r requirements.txt requirements-dev.txt foo/requirements.txt
+        (pip install `find . -name 'requirements*.txt' | rev | sed -z 's/\n/ r- /g' | rev`) || (echo "no requirements*.txt files")
       shell: bash
     - name: Run Mypy (and Try to Install Type-Packages)
       run: |

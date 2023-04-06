@@ -29,5 +29,8 @@ runs:
       run: |
         flags="--namespace-packages --exclude build/"
         it_flags="--install-types --non-interactive"
-        (mypy $it_flags $flags . 2>/dev/null) || (echo "no type-packages to install" && mypy $flags .)
+        # do mypy (may fail the first time if missing 3rd party packages, second time uses mypy cache for 3rd party packages)
+        (mypy $it_flags $flags -v . 2> stderr.txt) || (mypy $flags -v . 2> stderr.txt)
+        # show which files were looked at (-v must be used to produce file names)
+        grep "Found source" stderr.txt | sed "s_.*path='\(.*\)py'.*_\1py_"
       shell: bash

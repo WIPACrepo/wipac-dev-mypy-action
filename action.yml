@@ -27,10 +27,10 @@ runs:
         # pip install dependencies
         set -x
         #
-        # PACKAGE -> pip install (try 'mypy' extra first)
+        # PACKAGE -> pip install (try 'mypy'-extra first)
         if [ -e "setup.py" ]; then
-          echo "installing dependencies from setup.py..."
-          pip install .[mypy]  # okay if 'mypy' extra doesn't exist (it'll just install .)
+          echo "installing dependencies from setup.py (will work even if 'mypy'-extra doesn't exist)..."
+          pip install .[mypy]
         #
         # SCRIPT -> install all requirements*.txt files
         elif [ -n "$(find . -name 'requirements*.txt' | head -1)" ]; then

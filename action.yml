@@ -15,22 +15,40 @@ description: 'GitHub Action Package for Running Mypy'
 runs:
   using: "composite"
   steps:
+
     - run: pip install --upgrade pip
       shell: bash
+
     - run: pip install mypy
       shell: bash
-    - name: Pip Install Local Package and All 'requirements*.txt' Files We Find
+
+    - name: pip install dependencies
       run: |
-        ([ -e "setup.py" ] && pip install .) || (echo "no setup.py")
-        # ex: pip install -r requirements.txt requirements-dev.txt foo/requirements.txt
-        (pip install `find . -name 'requirements*.txt' | rev | sed -z 's/\n/ r- /g' | rev`) || (echo "no requirements*.txt files")
+        #
+        # PACKAGE -> pip install (try 'mypy' extra first)
+        if [ -e "setup.py" ]; then
+          pip install .[mypy] || pip install .
+        #
+        # SCRIPT -> install all requirements*.txt files
+        elif [ -n "$(find . -name 'requirements*.txt' | head -1)" ]; then
+          # ex: pip install -r requirements.txt requirements-dev.txt foo/requirements.txt
+          pip install $(find . -name 'requirements*.txt' | rev | sed -z 's/\n/ r- /g' | rev)
+        #
+        # ERROR
+        else
+          echo "could not install dependencies -- did not find setup.py or requirements*.txt file(s)"
+          exit 2
+        fi
       shell: bash
-    - name: Run Mypy (and Try to Install Type-Packages)
+
+    - name: run mypy (and try to install type-packages)
       run: |
         flags="--namespace-packages --exclude build/"
         it_flags="--install-types --non-interactive"
+
         # do mypy (may fail the first time if missing 3rd party packages, second time uses mypy cache for 3rd party packages)
         (mypy $it_flags $flags -v . 2> stderr.txt) || (mypy $flags -v . 2> stderr.txt)
+
         # show which files were looked at (-v must be used to produce file names)
         grep "Found source" stderr.txt | sed "s_.*path='\(.*\)py'.*_\1py_"
       shell: bash

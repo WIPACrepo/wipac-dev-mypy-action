@@ -27,11 +27,13 @@ runs:
         #
         # PACKAGE -> pip install (try 'mypy' extra first)
         if [ -e "setup.py" ]; then
+          echo "installing dependencies from setup.py..."
           pip install .[mypy] || pip install .
         #
         # SCRIPT -> install all requirements*.txt files
         elif [ -n "$(find . -name 'requirements*.txt' | head -1)" ]; then
           # ex: pip install -r requirements.txt requirements-dev.txt foo/requirements.txt
+          echo "installing dependencies from requirements*.txt files..."
           pip install $(find . -name 'requirements*.txt' | rev | sed -z 's/\n/ r- /g' | rev)
         #
         # ERROR

@@ -28,7 +28,7 @@ runs:
         # PACKAGE -> pip install (try 'mypy' extra first)
         if [ -e "setup.py" ]; then
           echo "installing dependencies from setup.py..."
-          pip install .[mypy] || pip install .
+          pip install .[mypy]  # okay if 'mypy' extra doesn't exist (it'll just install .)
         #
         # SCRIPT -> install all requirements*.txt files
         elif [ -n "$(find . -name 'requirements*.txt' | head -1)" ]; then

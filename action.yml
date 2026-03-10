@@ -1,20 +1,30 @@
-name: 'WIPAC Dev Mypy'
-description: 'GitHub Action Package for Running Mypy'
+name: 'Publicly Deprecated WIPAC Dev Mypy'
+description: 'Publicly Deprecated GitHub Action Package for Running Mypy'
 
-# inputs:
-#   who-to-greet:  # id of input
-#     description: 'Who to greet'
-#     required: true
-#     default: 'World'
-
-# outputs:
-#   random-number:
-#     description: "Random number"
-#     value: ${{ steps.random-number-generator.outputs.random-id }}
+inputs:
+  _no_deprecation:
+    description: |
+      For internal use only
+        Do not show deprecation error message and exit with error code 1.
+        true/false
+    required: false
+    default: "false"
 
 runs:
   using: "composite"
   steps:
+    - name: Deprecated
+      if: ${{ inputs._no_deprecation != 'true' }}
+      run: |
+        # step: Deprecated
+        set -euo pipefail
+
+        echo "::error::This action has been deprecated and can no longer be used (see below)."
+        echo "::notice::Use the reusable workflow 'WIPACrepo/wipac-dev-workflows/.github/workflows/lint-python.yml@<ref>' instead."
+        echo "::notice::See https://github.com/WIPACrepo/wipac-dev-workflows/tree/main/.github/workflows/lint-python.md for details."
+
+        exit 1
+      shell: bash
 
     - run: pip install --upgrade pip
       shell: bash
@@ -24,7 +34,9 @@ runs:
 
     - name: pip install dependencies
       run: |
+        # step: pip install dependencies
         # pip install dependencies
+        set -euo pipefail
         set -x
         #
         # PACKAGE -> pip install (try 'mypy'-extra first)
@@ -47,6 +59,8 @@ runs:
 
     - name: run mypy (and try to install type-packages)
       run: |
+        # step: run mypy (and try to install type-packages)
+        set -euo pipefail
         flags="--namespace-packages --exclude build/"
         it_flags="--install-types --non-interactive"
 

@@ -40,8 +40,8 @@ runs:
         set -x
         #
         # PACKAGE -> pip install (try 'mypy'-extra first)
-        if [ -e "setup.py" ]; then
-          echo "installing dependencies from setup.py (will work even if 'mypy'-extra doesn't exist)..."
+        if [ -e "pyproject.toml" ] || [ -e "setup.py" ]; then
+          echo "installing dependencies from python package (will work even if 'mypy'-extra doesn't exist)..."
           pip install .[mypy]
         #
         # SCRIPT -> install all requirements*.txt files
@@ -52,7 +52,7 @@ runs:
         #
         # ERROR
         else
-          echo "could not install dependencies -- did not find setup.py or requirements*.txt file(s)"
+          echo "could not install dependencies -- did not find pyproject.toml or requirements*.txt file(s)"
           exit 2
         fi
       shell: bash
